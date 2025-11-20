@@ -1,0 +1,135 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+html {
+    scroll-behavior: smooth;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+body {
+    background-color: #f4f4f9;
+    color: #333;
+}
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 35px auto;
+    padding: 20px;
+    max-width: 800px;
+}
+
+h1 {
+    color: rgb(255, 162, 0);
+    margin-bottom: 20px;
+}
+
+.add-form {
+    margin: 15px;
+    padding: 15px;
+    box-shadow: 0px -3px 16px -4px rgba(0,0,0,0.52);
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 500px;
+    background: #fff;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.add-form input, .add-form textarea {
+    margin: 15px 0;
+    padding: 10px 15px;
+    border: 1.5px solid rgb(255, 162, 0);
+    outline: none;
+    border-radius: 5px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 16px;
+}
+
+.add-form textarea::placeholder{
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.add-form button{
+    background-color: rgb(255, 162, 0);
+    padding: 15px;
+    border-radius: 15px;
+    color: white;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 16px;
+}
+.add-form button:hover{
+    background-color: rgb(228, 154, 25);
+    transform: scale(1.03);
+}
+
+.todo-list {
+    list-style: none;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.todo-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+}
+
+.todo-item h4 {
+    margin-bottom: 5px;
+}
+
+.todo-actions{
+    display: flex;
+    align-items: center;
+}
+
+.edit-btn{
+    background-color: #3498db;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    text-decoration: none;
+    margin-right: 10px;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.edit:hover{
+    background-color: #2980b9;
+}
+
+.delete-btn {
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.delete-btn:hover {
+    background-color: #f32812;
+    color: white;
+}
