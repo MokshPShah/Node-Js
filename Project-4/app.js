@@ -1,6 +1,6 @@
 const express = require('express')
 const mongoose = require('mongoose')
-const Book = require("./model/bookModel")
+const Book = require("./model/bookModel");
 const PORT = 9000;
 
 const app = express();
@@ -49,6 +49,66 @@ app.get('/view', async (req, res) => {
         res.status(500).send('Error fetching books');
     }
 });
+
+app.get('/edit/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const book = await Book.findById(id);
+
+        if (!book) {
+            return res.status(404).send('Book not found');
+        }
+
+        res.render('edit', { book });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error fetching book for editing');
+    }
+})
+
+app.post('/update/:id', async (req, res) => {
+    const { id } = req.params;
+    const { title, author, isbn, price, language, desc } = req.body;
+
+    try {
+
+        const updateBook = await Book.findByIdAndUpdate(id, {
+            title,
+            author,
+            isbn,
+            price,
+            language,
+            desc
+        })
+
+        if (!updateBook) {
+            return res.status(404).send('Book not found');
+        }
+
+        res.redirect('/view');
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error while updating the book');
+    }
+})
+
+app.post('/delete/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const deleteBook = await Book.findByIdAndDelete(id);
+
+        if (!deleteBook) {
+            return res.status(404).send('Book not found');
+        }
+        res.redirect('/view')
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error while deleting the book');
+    }
+
+})
 
 app.listen(PORT, (err) => {
     if (err) {
