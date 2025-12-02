@@ -32,7 +32,7 @@ Different projects in this repository may use:
 ### **Templating & UI**
 
 * EJS
-* HTML / CSS / SCSS
+* CSS 
 * ES6 JavaScript
 
 ### **Tools & Utilities**
