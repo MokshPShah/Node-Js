@@ -29,7 +29,7 @@
                     </form>
                     <ul class="navbar-nav mb-2 mb-lg-0 gap-3">
                         <li class="nav-item">
-                            <a class="btn btn-danger" aria-current="page" href="/addMovie">Add Movie</a>
+                            <a class="btn btn-danger" aria-current="page" href="/movies/addMovie">Add Movie</a>
                         </li>
                         <li class="nav-item">
                             <a class="btn btn-outline-danger" href="/movies/viewAllMovie">View All Movie</a>
@@ -46,53 +46,62 @@
         <div class="container mt-5" style="max-width: 750px;">
             <div class="card shadow">
                 <div class="card-body">
-                    <h3 class="my-4 text-center">Add New Movie</h3>
-                    <form action="/movies/addNewMovie" method="POST" enctype="multipart/form-data">
+                    <h3 class="my-4 text-center">Edit Movie Details</h3>
+                    <form action="/movies/updateMovie/<%= movie._id %>" method="POST" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label class="form-label fw-bold">Movie Title</label>
-                            <input type="text" name="title" class="form-control" required>
+                            <input type="text" name="title" class="form-control" required value="<%= movie.title %>">
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Upload Poster (.jpg/.jpeg)</label>
-                            <input class="form-control" type="file" accept=".jpg,.jpeg" name="image" required>
+                            <input class="form-control" type="file" accept=".jpg,.jpeg" name="image">
+                            <div class="my-3">
+                                <p class="fw-bold mb-1">Old Movie Poster</p>
+                                <img src="/uploads/<%= movie.image %>" alt="<%= movie.title %>" width="100" height="100"
+                                    class="object-fit-contain">
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Languages</label>
                             <input type="text" name="language" class="form-control"
-                                placeholder="Enter languages separated by comma" required>
+                                placeholder="Enter languages separated by comma" required value="<%= movie.language %>">
                         </div>
                         <div class="d-flex gap-5">
                             <div class="col-5">
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Genre</label>
                                     <input type="text" name="genre" class="form-control"
-                                        placeholder="Enter genres separated by comma" required>
+                                        placeholder="Enter genres separated by comma" required
+                                        value="<%= movie.genre %>">
                                 </div>
                             </div>
                             <div class="col-5">
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Duration</label>
                                     <input type="text" name="duration" class="form-control"
-                                        placeholder="Enter movie duration" required>
+                                        placeholder="Enter movie duration" required value="<%= movie.duration %>">
                                 </div>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Rating</label>
-                            <input type="number" step="0.1" min="0" max="10" name="rating" class="form-control"
-                                required>
+                            <input type="number" step="0.1" min="0" max="10" name="rating" class="form-control" required
+                                value="<%= movie.rating %>">
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Description</label>
-                            <textarea name="desc" class="form-control" rows="3" required></textarea>
+                            <textarea name="desc" class="form-control" rows="3" required> <%= movie.desc %></textarea>
                         </div>
                         <div class="text-center">
-                            <button class="btn btn-outline-danger px-5" type="submit">Add Movie</button>
+                            <button class="btn btn-outline-danger px-5" type="submit">Update Movie</button>
                         </div>
 
                     </form>
 
                 </div>
+
+                <!-- old poster -->
+
             </div>
         </div>
     </main>

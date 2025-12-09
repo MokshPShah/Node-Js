@@ -9,7 +9,7 @@ router.use(express.urlencoded());
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, './uploads');
+        cb(null, 'public/uploads');
     },
     filename: (req, file, cb) => {
         cb(null, Date.now() + '-' + path.extname(file.originalname));
@@ -36,5 +36,10 @@ const upload = multer({
 router.get('/addMovie', MovieCtl.addMovie);
 router.post('/addNewMovie', upload.single('image'), MovieCtl.addNewMovie);
 router.get('/', MovieCtl.getAllMovies);
+router.get('/movieDetails/:id', MovieCtl.MovieDetails);
+router.get('/viewAllMovie', MovieCtl.viewAllMovie);
+router.get('/editMovie/:id', MovieCtl.editMovie);
+router.post('/updateMovie/:id', upload.single('image'), MovieCtl.updateMovie);
+router.get('/deleteMovie/:id', upload.single('image'), MovieCtl.deleteMovie);
 
 module.exports = router;
