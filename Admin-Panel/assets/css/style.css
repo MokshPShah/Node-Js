@@ -12,3 +12,11 @@
 ::-webkit-scrollbar-thumb:hover {
     background-color: #5f58de;
 }
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+    transition: 0.2s;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}

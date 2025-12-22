@@ -94,14 +94,19 @@ exports.updateMovie = async (req, res) => {
 exports.deleteMovie = async (req, res) => {
     try {
         const movie = await Movie.findById(req.params.id);
-        
+
         fs.unlinkSync(`public/uploads/${movie.image}`);
 
         await Movie.findByIdAndDelete(movie._id)
-        
+
         res.redirect('/movies/viewAllMovie')
     } catch (err) {
         console.log(err);
         res.send("Error saving movie");
     }
 }
+
+router.get('/admin-details/:id', async (req, res) => {
+    const admin = await Admin.findById(req.params.id);
+    res.json(admin);
+});

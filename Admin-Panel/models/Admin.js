@@ -33,6 +33,10 @@ const adminSchema = new mongoose.Schema({
     avatar: {
         type: String,
         required: true
+    },
+    date: {
+        type: Date,
+        retuired: true
     }
 })
 
