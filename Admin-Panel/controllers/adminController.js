@@ -45,10 +45,11 @@ module.exports.verifyLogin = async (req, res) => {
     }
 };
 
-module.exports.dashboard = (req, res) => {
+module.exports.dashboard = async (req, res) => {
     try {
         const admin = req.user
-        res.render('dashboard', { title: 'Dashboard', admin })
+        const admins = await Admin.find();
+        res.render('dashboard', { title: 'Dashboard', admin, admins })
     } catch (error) {
         console.log(error)
     }
