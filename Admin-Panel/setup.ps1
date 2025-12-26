@@ -1,5 +1,5 @@
 # Create folders
-$folders = "views", "assets", "uploads", "config", "models", "routes", "controllers"
+$folders = "views", "assets", "uploads", "config", "models", "routes", "controllers", "middleware"
 foreach ($folder in $folders) {
     New-Item -ItemType Directory -Name $folder -Force
 }

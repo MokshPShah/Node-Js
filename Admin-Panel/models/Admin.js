@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const path = require('path')
 const multer = require('multer')
 
-const imagePath = '/uploads/adminImages';
+const imagePath = '/uploads/adminImages/';
 
 const adminSchema = new mongoose.Schema({
     name: {

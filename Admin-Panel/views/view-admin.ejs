@@ -25,6 +25,7 @@
                             </tr>
                         </thead>
                         <tbody id="adminTableBody" class="bg-white divide-y divide-slate-200">
+
                             <% if (admins.length===0) { %>
                                 <tr>
                                     <td colspan="5" class="text-center py-8 text-slate-500">
@@ -32,14 +33,17 @@
                                     </td>
                                 </tr>
                                 <% } %>
-
                                     <% admins.forEach(admin=> { %>
-                                        <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                                        <tr class="hover:bg-slate-50 transition border-b border-slate-100"
+                                            id="row-<%= admin._id %>">
+
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="flex items-center">
-                                                    <img src="../uploads/adminImages/<%=admin.avatar%>"
+                                                    <img src="<%= admin.avatar %>"
                                                         class="h-10 w-10 rounded-full object-cover ring-2 ring-white shadow-sm"
-                                                        alt="<%= admin.fname + ' ' + admin.lname %>">
+                                                        alt="<%= admin.name %>"
+                                                        [cite_start]onerror="this.src='https://ui-avatars.com/api/?name=<%= admin.name %>&background=cbd5e1&color=fff'">
+
                                                     <div class="ml-4">
                                                         <div class="text-sm font-medium text-slate-900">
                                                             <%= admin.name %>
@@ -49,7 +53,7 @@
                                             </td>
 
                                             <td class="px-6 py-4 text-sm text-slate-600">
-                                                <%= admin.email %>
+                                                <a href="mailto:<%= admin.email %>"><%= admin.email %></a>
                                             </td>
 
                                             <td class="px-6 py-4 text-sm text-slate-600">
@@ -57,29 +61,27 @@
                                             </td>
 
                                             <td class="px-6 py-4 text-sm text-slate-500">
-                                                <%= admin.hobby.join(', ') %>
-                                            </td>
+                                                <%= admin.hobby ? admin.hobby.join(', ') : '' %>
+                            </td>
 
-                                            <td class="px-6 py-4 text-right text-sm space-x-2">
-
-                                                <!-- VIEW -->
-                                                <button type="button" onclick="viewAdmin(' <%=admin._id %>')"
+                                <td class="px-6 py-4 text-right text-sm space-x-2">
+                                
+                                    <button type="button" onclick="viewAdmin(' <%=admin._id %>')"
                                                     class="text-indigo-600 hover:text-indigo-900 p-2 hover:bg-indigo-50
-                                                    rounded">
+                                                    rounded transition" title="View Details">
                                                     <i data-lucide="eye" class="w-4 h-4"></i>
                                                     </button>
 
-                                                    <!-- EDIT -->
-                                                    <button onclick="openEditModal('<%= admin._id %>')"
-                                                        class="text-amber-600 hover:text-amber-900 p-2 hover:bg-amber-50 rounded inline-flex items-center justify-center">
-                                                        <i data-lucide="edit-2"></i>
+                                                    <button type="button" onclick="openEditModal('<%= admin._id %>')"
+                                                        class="text-amber-600 hover:text-amber-900 p-2 hover:bg-amber-50 rounded transition"
+                                                        title="Edit">
+                                                        <i data-lucide="edit-2" class="w-4 h-4"></i>
                                                     </button>
 
-                                                    <!-- DELETE -->
-                                                    <a href="/delete-admin/<%= admin._id %>"
+                                                    <a href="delete-admin/?deleteAdmin=<%= admin._id %>"
                                                         onclick="return confirm('Are you sure you want to delete this admin?')"
-                                                        class="text-amber-600 hover:text-amber-900 p-2 hover:bg-amber-50 rounded inline-flex items-center justify-center">
-                                                        <i data-lucide="trash-2"></i>
+                                                        class="text-red-600 hover:text-red-900 p-2 hover:bg-amber-50 rounded inline-flex items-center justify-center">
+                                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
                                                     </a>
                                             </td>
                                         </tr>
@@ -90,25 +92,14 @@
             </div>
         </main>
     </div>
-    </div>
 
-    <div id="modalOverlay"
-        class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50 backdrop-blur-sm">
-        <div id="modalContent"
-            class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all p-6">
-        </div>
-    </div>
-
-    <!-- GLOBAL MODAL -->
     <div id="modalOverlay"
         class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50 backdrop-blur-sm"
         onclick="closeModal()">
-
-        <div id="modalContent" class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden p-6"
+        <div id="modalContent"
+            class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all p-6"
             onclick="event.stopPropagation()">
         </div>
     </div>
-
-
 
     <%- include('layouts/footer'); %>

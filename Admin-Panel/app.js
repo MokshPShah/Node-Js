@@ -14,6 +14,9 @@ app.use(express.urlencoded({ extended: true }))
 app.use('/uploads', express.static('uploads'));
 
 app.use('/', require('./routes/adminRoutes.js'))
+app.get('/', (req, res) => {
+    res.redirect('/dashboard')
+})
 
 app.listen(PORT, (err) => {
     if (err) {
