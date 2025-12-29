@@ -105,8 +105,3 @@ exports.deleteMovie = async (req, res) => {
         res.send("Error saving movie");
     }
 }
-
-router.get('/admin-details/:id', async (req, res) => {
-    const admin = await Admin.findById(req.params.id);
-    res.json(admin);
-});
