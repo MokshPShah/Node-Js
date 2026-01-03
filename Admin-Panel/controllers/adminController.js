@@ -29,10 +29,8 @@ module.exports.verifyLogin = async (req, res) => {
         if (isMatch) {
             res.cookie("authToken", admin._id.toString(), {
                 httpOnly: true,
-                signed: true,
-                maxAge: 1000 * 10 * 10
+                maxAge: 1000 * 60 * 60 * 24
             });
-            res.cookie('authToken', admin._id, { signed: true, httpOnly: true });
             res.redirect('/');
         } else {
             console.log("Invalid Password");
@@ -45,37 +43,141 @@ module.exports.verifyLogin = async (req, res) => {
     }
 };
 
+module.exports.logout = (req, res) => {
+    res.clearCookie('authToken');
+    res.redirect('/login')
+}
+
 module.exports.dashboard = async (req, res) => {
     try {
-        const admin = req.user
+        if (!req.cookies.authToken) return res.redirect('/login');
+
+        const admin = await Admin.findById(req.cookies.authToken);
         const admins = await Admin.find();
-        res.render('dashboard', { title: 'Dashboard', admin, admins })
+
+        if (admin) {
+            res.render('dashboard', {
+                title: 'Dashboard',
+                admin,
+                admins
+            })
+        } else {
+            res.redirect('/login')
+        }
+
     } catch (error) {
         console.log(error)
+        res.redirect('/login')
     }
 }
 
-module.exports.addAdmin = (req, res) => {
+module.exports.profile = async (req, res) => {
     try {
-        const admin = req.user
+        if (!req.cookies.authToken) return res.redirect('/login');
+
+        const admin = await Admin.findById(req.cookies.authToken)
+
+        if (admin) {
+            res.render('profile', {
+                title: 'My Profile',
+                admin
+            });
+        } else {
+            res.redirect('/login')
+        }
+    } catch (error) {
+        console.log(error)
+        res.redirect('/login')
+    }
+}
+
+module.exports.updateProfile = async (req, res) => {
+    try {
+        const adminId = req.cookies.authToken
+        if (!adminId) return res.redirect('/login');
+
+        const admin = await Admin.findById(adminId);
+        if (!admin) {
+            return res.redirect('/login');
+        }
+
+        const hobbies = req.body.hobby || [];
+        if(!Array.isArray(hobbies)) {
+            hobbies = [hobbies]
+        }
+
+        let password = admin.password;
+        if (req.body.password && req.body.password.trim() !== '') {
+            password = await bcrypt.hash(req.body.password, 12);
+        }
+
+        const updateData = {
+            name: req.body.fname + ' ' + req.body.lname,
+            email: req.body.email,
+            gender: req.body.gender,
+            hobby: hobbies,
+            desc: req.body.desc,
+            date: req.body.date,
+            password: password,
+            avatar: admin.avatar
+        }
+
+        if (req.body.date && req.body.date !== '') {
+            updateData.date = req.body.date;
+        }
+
+        if (req.file) {
+            const newImageString = Admin.adPath + req.file.filename;
+
+            const oldImagePath = path.join(__dirname, '..', 'uploads', 'adminImages', path.basename(admin.avatar));
+
+            if (admin.avatar && fs.existsSync(oldImagePath)) {
+                fs.unlinkSync(oldImagePath);
+            }
+            updateData.avatar = newImageString;
+        }
+        await Admin.findByIdAndUpdate(adminId, updateData);
+
+        res.redirect('/profile');
+    } catch (error) {
+        console.log(error)
+        res.redirect('/login')
+    }
+}
+
+module.exports.addAdmin = async (req, res) => {
+    try {
+        if (!req.cookies.authToken) return res.redirect('/login');
+
+        const admin = await Admin.findById(req.cookies.authToken)
         res.render('add-admin', { title: 'Add-Admin', admin })
     } catch (error) {
         console.log(error)
+        res.redirect('/login')
     }
 }
 
 module.exports.viewAdmin = async (req, res) => {
-    const admin = req.user
-    const admins = await Admin.find({});
-    res.render('view-admin', {
-        title: 'View Admin',
-        admins,
-        admin
-    });
+    try {
+        if (!req.cookies.authToken) return res.redirect('/login');
+
+        const admin = await Admin.findById(req.cookies.authToken)
+        const admins = await Admin.find({});
+        res.render('view-admin', {
+            title: 'View Admin',
+            admins,
+            admin
+        });
+    } catch (error) {
+        console.log(error)
+        res.redirect('/login')
+    }
 };
 
 module.exports.insertAdminData = async (req, res) => {
     try {
+        const currentAdmin = await Admin.findById(req.cookies.authToken)
+
         const exisitingEmail = await Admin.findOne({ email: req.body.email })
 
         if (exisitingEmail) {
@@ -103,9 +205,7 @@ module.exports.insertAdminData = async (req, res) => {
             avatar: imagePath,
             date: date
         });
-
         res.redirect('/add-admin')
-
     }
     catch (err) {
         console.log(err);
