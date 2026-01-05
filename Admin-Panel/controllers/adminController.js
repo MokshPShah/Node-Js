@@ -2,6 +2,7 @@ const Admin = require("../models/Admin")
 const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcrypt');
+const nodemailer = require("nodemailer");
 
 module.exports.login = (req, res) => {
     try {
@@ -102,7 +103,7 @@ module.exports.updateProfile = async (req, res) => {
         }
 
         const hobbies = req.body.hobby || [];
-        if(!Array.isArray(hobbies)) {
+        if (!Array.isArray(hobbies)) {
             hobbies = [hobbies]
         }
 
@@ -142,6 +143,166 @@ module.exports.updateProfile = async (req, res) => {
     } catch (error) {
         console.log(error)
         res.redirect('/login')
+    }
+}
+
+module.exports.settings = async (req, res) => {
+    try {
+        const adminId = req.cookies.authToken;
+        if (!adminId) return res.redirect('/login')
+
+        const admin = await Admin.findById(adminId);
+        res.render('settings', { title: "My Profile", admin })
+    } catch (error) {
+
+    }
+}
+
+module.exports.changePassword = async (req, res) => {
+    try {
+        const adminId = req.cookies.authToken
+        if (!adminId) return res.redirect('/login')
+
+        const admin = await Admin.findById(adminId)
+        if (!admin) return res.redirect('/login')
+
+        let isMatch = await bcrypt.compare(req.body.current_password, admin.password);
+        if (isMatch) {
+            if (req.body.new_password === req.body.confirm_password) {
+                const hashPassword = await bcrypt.hash(req.body.new_password, 12);
+
+                await Admin.findByIdAndUpdate(adminId, { password: hashPassword });
+                return res.redirect('/settings');
+            } else {
+                console.log("New Password and Confirm Password should be same")
+                return res.redirect('/settings')
+            }
+        } else {
+            console.log("password not match with current password")
+            return res.redirect('/settings')
+        }
+    } catch (error) {
+        console.log(error);
+        res.redirect('/login')
+    }
+}
+
+module.exports.checkEmail = async (req, res) => {
+    try {
+        res.render('forgetPassword/check-email');
+    } catch (error) {
+        console.log(error)
+        res.redirect('/login')
+    }
+}
+
+module.exports.sendOtp = async (req, res) => {
+    try {
+        const email = req.body.email;
+        const admin = await Admin.findOne({ email: email })
+
+        if (!admin) {
+            console.log("Email not found");
+            return res.redirect('/login');
+        }
+
+        const OTP = Math.floor(Math.random() * 999999)
+        const transpoter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'shahmoksh90651@gmail.com',
+                pass: 'siwsljxehjjrpfdz'
+            }
+        })
+
+        const mailOptions = {
+            from: 'Nexus Admin <shahmoksh90651@gmail.com>',
+            to: email,
+            subject: 'Password Reset OTP',
+            text: '',
+            html: `Your OTP for password reset is: <b> ${OTP} </b>`
+        }
+
+        transpoter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log(error)
+                return res.redirect('/forgetPassword/check-email');
+            } else {
+                console.log('Email sent: ' + info.response)
+
+                res.cookie('otp', OTP, { maxAge: 300000, httpOnly: true });
+                res.cookie('resetEmail', email, { maxAge: 300000, httpOnly: true });
+
+                return res.redirect('/forgetPassword/otp');
+            }
+        })
+
+    } catch (error) {
+        console.log(error)
+        res.redirect('/forgetPassword/check-email')
+    }
+}
+
+module.exports.otp = async (req, res) => {
+    try {
+        res.render('forgetPassword/otp');
+    } catch (error) {
+        console.log(error)
+        res.redirect('/forgetPassword/check-email')
+    }
+}
+
+module.exports.verifyOtp = async (req, res) => {
+    try {
+        const userOtp = req.body.otp;
+        const cookieOTP = req.cookies.otp;
+
+        if (userOtp === cookieOTP) {
+            res.redirect('/forgetPassword/set-password');
+        } else {
+            console.log("Invalid OTP");
+            res.redirect('forgetPassword/otp');
+        }
+    } catch (error) {
+        console.log(error)
+        res.redirect('/forgetPassword/otp')
+    }
+}
+
+module.exports.setPassword = async (req, res) => {
+    try {
+        res.render('forgetPassword/set-password')
+
+    } catch (error) {
+        console.log(error)
+        res.redirect('/forgetPassword/set-password')
+    }
+}
+
+module.exports.resetPassword = async (req, res) => {
+    try {
+        const { new_password, confirm_password } = req.body;
+        const email = req.cookies.resetEmail;
+
+        if (!email) return res.redirect('/forgetPassword/check-email')
+
+        if (new_password === confirm_password) {
+            const hashPassword = await bcrypt.hash(new_password, 12);
+
+            await Admin.findOneAndUpdate({ email: email }, { password: hashPassword });
+
+            res.clearCookie('otp');
+            res.clearCookie('resetEmail');
+
+            console.log("Password reset successfully");
+            res.redirect('/login');
+        } else {
+            console.log("Passwords do not match");
+            res.redirect('/forgetPassword/set-password');
+        }
+    } catch (error) {
+        console.log(error)
+        res.redirect('/forgetPassword/set-password');
     }
 }
 
