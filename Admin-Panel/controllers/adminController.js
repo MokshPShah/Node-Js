@@ -3,41 +3,82 @@ const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcrypt');
 const nodemailer = require("nodemailer");
+const passport = require('passport');
+
+module.exports.signup = (req, res) => {
+    try {
+        if (req.isAuthenticated()) {
+            return res.redirect('/dashboard');
+        }
+        res.render('signup')
+    } catch (error) {
+        console.log(error)
+        return res.redirect('/signup');
+    }
+}
+
+module.exports.registerAdmin = async (req, res) => {
+    try {
+        const { fname, lname, email, password, confirm_password, gender, desc, date } = req.body;
+
+        if (password !== confirm_password) {
+            req.flash('error', 'Passwords do not match')
+            return res.redirect('/signup')
+        }
+
+        const exisitingEmail = await Admin.findOne({ email: email })
+        if (exisitingEmail) {
+            req.flash('error', 'Email already exists...')
+            return res.redirect('/signup')
+        }
+
+        let hobbies = req.body.hobby ? req.body.hobby : []
+        if (!Array.isArray(hobbies)) {
+            hobbies = [hobbies]
+        }
+
+        let imagePath = '';
+        if (req.file) {
+            imagePath = req.file ? Admin.adPath + req.file.filename : null;
+        }
+
+        const hashPassword = await bcrypt.hash(password, 12);
+        await Admin.create({
+            name: fname + ' ' + lname,
+            email: email,
+            password: hashPassword,
+            gender: gender,
+            hobby: hobbies,
+            desc: desc,
+            avatar: imagePath,
+            date: date
+        })
+
+        req.flash('success', 'Registration Successful! Please Login.');
+        return res.redirect('/login');
+    } catch (err) {
+        console.log(err);
+        req.flash('error', 'Error creating account');
+        res.redirect('/signup');
+    }
+};
 
 module.exports.login = (req, res) => {
     try {
-        if (req.cookies.authToken) {
-            return res.redirect('/');
+        if (req.isAuthenticated()) {
+            return res.redirect('/dashboard');
         }
         res.render('login', { title: 'Login' })
     } catch (error) {
         console.log(error)
+        return res.redirect('/login');
     }
 }
 
 module.exports.verifyLogin = async (req, res) => {
     try {
-        const { email, password } = req.body;
-        const admin = await Admin.findOne({ email: email });
-
-        if (!admin) {
-            console.log("Admin not found");
-            return res.redirect('/login');
-        }
-
-        const isMatch = await bcrypt.compare(password, admin.password);
-
-        if (isMatch) {
-            res.cookie("authToken", admin._id.toString(), {
-                httpOnly: true,
-                maxAge: 1000 * 60 * 60 * 24
-            });
-            res.redirect('/');
-        } else {
-            console.log("Invalid Password");
-            res.redirect('/login');
-        }
-
+        req.flash('success', 'Welcome back! Logged in successfully.');
+        return res.redirect('/dashboard');
     } catch (err) {
         console.log(err);
         res.redirect('/login');
@@ -45,16 +86,14 @@ module.exports.verifyLogin = async (req, res) => {
 };
 
 module.exports.logout = (req, res) => {
-    res.clearCookie('authToken');
+    res.clearCookie('nexus_panel');
     res.redirect('/login')
 }
 
 module.exports.dashboard = async (req, res) => {
     try {
-        if (!req.cookies.authToken) return res.redirect('/login');
-
-        const admin = await Admin.findById(req.cookies.authToken);
-        const admins = await Admin.find();
+        let admin = req.user;
+        let admins = await Admin.find();
 
         if (admin) {
             res.render('dashboard', {
@@ -74,18 +113,11 @@ module.exports.dashboard = async (req, res) => {
 
 module.exports.profile = async (req, res) => {
     try {
-        if (!req.cookies.authToken) return res.redirect('/login');
-
-        const admin = await Admin.findById(req.cookies.authToken)
-
-        if (admin) {
-            res.render('profile', {
-                title: 'My Profile',
-                admin
-            });
-        } else {
-            res.redirect('/login')
-        }
+        const admin = req.user
+        res.render('profile', {
+            title: 'My Profile',
+            admin
+        });
     } catch (error) {
         console.log(error)
         res.redirect('/login')
@@ -94,11 +126,11 @@ module.exports.profile = async (req, res) => {
 
 module.exports.updateProfile = async (req, res) => {
     try {
-        const adminId = req.cookies.authToken
-        if (!adminId) return res.redirect('/login');
-
+        const adminId = req.user._id;
         const admin = await Admin.findById(adminId);
+
         if (!admin) {
+            req.flash('error', 'Admin not found');
             return res.redirect('/login');
         }
 
@@ -139,19 +171,17 @@ module.exports.updateProfile = async (req, res) => {
         }
         await Admin.findByIdAndUpdate(adminId, updateData);
 
+        req.flash('success', 'Profile updated successfully!');
         res.redirect('/profile');
     } catch (error) {
         console.log(error)
-        res.redirect('/login')
+        res.redirect('/profile')
     }
 }
 
 module.exports.settings = async (req, res) => {
     try {
-        const adminId = req.cookies.authToken;
-        if (!adminId) return res.redirect('/login')
-
-        const admin = await Admin.findById(adminId);
+        const admin = req.user;
         res.render('settings', { title: "My Profile", admin })
     } catch (error) {
 
@@ -160,30 +190,51 @@ module.exports.settings = async (req, res) => {
 
 module.exports.changePassword = async (req, res) => {
     try {
-        const adminId = req.cookies.authToken
-        if (!adminId) return res.redirect('/login')
+        const currentAdmin = await Admin.findById(req.user._id)
 
-        const admin = await Admin.findById(adminId)
-        if (!admin) return res.redirect('/login')
-
-        let isMatch = await bcrypt.compare(req.body.current_password, admin.password);
+        let isMatch = await bcrypt.compare(req.body.current_password, currentAdmin.password);
         if (isMatch) {
             if (req.body.new_password === req.body.confirm_password) {
                 const hashPassword = await bcrypt.hash(req.body.new_password, 12);
+                await Admin.findByIdAndUpdate(req.user._id, { password: hashPassword });
 
-                await Admin.findByIdAndUpdate(adminId, { password: hashPassword });
+                req.flash('success', 'Password changed successfully!');
                 return res.redirect('/settings');
             } else {
-                console.log("New Password and Confirm Password should be same")
+                req.flash('error', 'New password and confirm password do not match');
                 return res.redirect('/settings')
             }
         } else {
-            console.log("password not match with current password")
+            req.flash('error', 'Current password is incorrect')
             return res.redirect('/settings')
         }
     } catch (error) {
         console.log(error);
+        req.flash('error', 'Something went wrong');
         res.redirect('/login')
+    }
+}
+
+module.exports.deleteMyAccount = async (req, res) => {
+    try {
+        const admin = await Admin.findById(req.user._id);
+        if (admin) {
+            const oldImagePath = path.join(__dirname, '..', 'uploads', 'adminImages', path.basename(admin.avatar));
+            if (fs.existsSync(oldImagePath)) {
+                fs.unlinkSync(oldImagePath);
+            }
+            await Admin.findByIdAndDelete(req.user._id);
+            req.logout(() => {
+                req.flash('success', 'Your account has been deleted.');
+                res.redirect('/login')
+            });
+        } else {
+            res.redirect('/settings');
+        }
+    } catch (error) {
+        console.log(error);
+        req.flash('error', 'Error deleting account');
+        res.redirect('/settings');
     }
 }
 
@@ -203,6 +254,7 @@ module.exports.sendOtp = async (req, res) => {
 
         if (!admin) {
             console.log("Email not found");
+            req.flash('error', 'Email not found')
             return res.redirect('/login');
         }
 
@@ -233,12 +285,14 @@ module.exports.sendOtp = async (req, res) => {
                 res.cookie('otp', OTP, { maxAge: 300000, httpOnly: true });
                 res.cookie('resetEmail', email, { maxAge: 300000, httpOnly: true });
 
+                req.flash('success', 'OTP sent to your email!');
                 return res.redirect('/forgetPassword/otp');
             }
         })
 
     } catch (error) {
         console.log(error)
+        req.flash('error', 'Error sending OTP! Try again');
         res.redirect('/forgetPassword/check-email')
     }
 }
@@ -258,13 +312,15 @@ module.exports.verifyOtp = async (req, res) => {
         const cookieOTP = req.cookies.otp;
 
         if (userOtp === cookieOTP) {
+            req.flash('success', 'OTP Verified! Please set a new password.');
             res.redirect('/forgetPassword/set-password');
         } else {
-            console.log("Invalid OTP");
+            req.flash('error', 'Invalid OTP. Please try again.');
             res.redirect('forgetPassword/otp');
         }
     } catch (error) {
         console.log(error)
+        req.flash('error', 'Invalid OTP. Please try again.');
         res.redirect('/forgetPassword/otp')
     }
 }
@@ -294,24 +350,21 @@ module.exports.resetPassword = async (req, res) => {
             res.clearCookie('otp');
             res.clearCookie('resetEmail');
 
-            console.log("Password reset successfully");
+            req.flash('success', 'Password reset successfully! Please login.');
             res.redirect('/login');
         } else {
             console.log("Passwords do not match");
             res.redirect('/forgetPassword/set-password');
         }
     } catch (error) {
-        console.log(error)
+        req.flash('error', 'Passwords do not match');
         res.redirect('/forgetPassword/set-password');
     }
 }
 
 module.exports.addAdmin = async (req, res) => {
     try {
-        if (!req.cookies.authToken) return res.redirect('/login');
-
-        const admin = await Admin.findById(req.cookies.authToken)
-        res.render('add-admin', { title: 'Add-Admin', admin })
+        res.render('add-admin', { title: 'Add-Admin', admin: req.user })
     } catch (error) {
         console.log(error)
         res.redirect('/login')
@@ -320,9 +373,7 @@ module.exports.addAdmin = async (req, res) => {
 
 module.exports.viewAdmin = async (req, res) => {
     try {
-        if (!req.cookies.authToken) return res.redirect('/login');
-
-        const admin = await Admin.findById(req.cookies.authToken)
+        const admin = req.user
         const admins = await Admin.find({});
         res.render('view-admin', {
             title: 'View Admin',
@@ -337,15 +388,11 @@ module.exports.viewAdmin = async (req, res) => {
 
 module.exports.insertAdminData = async (req, res) => {
     try {
-        const currentAdmin = await Admin.findById(req.cookies.authToken)
-
         const exisitingEmail = await Admin.findOne({ email: req.body.email })
 
         if (exisitingEmail) {
-            return res.render('add-admin', {
-                title: 'Add-Admin',
-                error: 'Email already exists. Try another email to create a account'
-            })
+            req.flash('error', 'Email already exists!');
+            return res.redirect('/add-admin');
         }
 
         const { fname, lname, email, password, gender, desc, date } = req.body
@@ -366,11 +413,14 @@ module.exports.insertAdminData = async (req, res) => {
             avatar: imagePath,
             date: date
         });
-        res.redirect('/add-admin')
+
+        req.flash('success', 'New Admin Created Successfully!');
+        res.redirect('/view-admin')
     }
     catch (err) {
         console.log(err);
-        res.send("Error Saving Data")
+        req.flash('error', 'Error creating admin');
+        res.redirect('/add-admin');
     }
 }
 
@@ -393,11 +443,12 @@ module.exports.deleteAdmin = async (req, res) => {
         fs.unlinkSync(oldImagePath)
 
         await Admin.findByIdAndDelete(admin)
-
+        req.flash('success', 'Admin deleted successfully');
         res.redirect('/view-admin')
     }
     catch (err) {
         console.log(err)
+        req.flash('error', 'Error deleting admin');
         res.send('Error Fetching Admin Details')
     }
 };
@@ -447,6 +498,6 @@ module.exports.updateAdmin = async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.send('Error Fetching Admin Details')
+        res.status(500).json({ success: false, message: 'Error updating admin' });
     }
 };

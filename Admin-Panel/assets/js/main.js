@@ -2,8 +2,11 @@
 // DOM READY & INITIALIZATION
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    initSidebar();
-    initUserDropdown();
+    // initSidebar();
+    // initUserDropdown();
+    // initCategoryDropdown();
+    initAllDropdowns();
+    initSidebarToggle();
     initImagePreview();
     initAddAdminValidation();
 
@@ -20,46 +23,143 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================
 // 1. SIDEBAR & NAVBAR LOGIC
 // ==========================================
-function initSidebar() {
-    const dropdownBtn = document.getElementById('dropdown-btn');
-    const dropdownMenu = document.getElementById('dropdown-menu');
-    const dropdownIcon = document.getElementById('dropdown-icon');
 
-    if (!dropdownBtn || !dropdownMenu) return;
+function initAllDropdowns() {
+    const setup = (btnId, menuId, iconId) => {
+        const btn = document.getElementById(btnId);
+        const menu = document.getElementById(menuId);
+        const icon = document.getElementById(iconId);
 
-    dropdownBtn.addEventListener('click', () => {
-        dropdownMenu.classList.toggle('hidden');
-        if (dropdownIcon) {
-            dropdownIcon.style.transform = dropdownMenu.classList.contains('hidden')
-                ? 'rotate(0deg)'
-                : 'rotate(180deg)';
-        }
-    });
+        if (!btn || !menu) return;
+
+        btn.addEventListener('click', (e) => {
+            // IF COLLAPSED: Do not toggle (CSS Hover handles it)
+            if (document.body.classList.contains('sidebar-collapsed')) return;
+
+            e.stopPropagation();
+            menu.classList.toggle('hidden');
+
+            if (icon) {
+                icon.style.transform = menu.classList.contains('hidden')
+                    ? 'rotate(0deg)'
+                    : 'rotate(180deg)';
+            }
+        });
+    };
+
+    setup('dropdown-btn', 'dropdown-menu', 'dropdown-icon'); // Admin
+    setup('cat-dropdown-btn', 'cat-dropdown-menu', 'cat-dropdown-icon'); // Category
+    setup('user-menu-btn', 'user-dropdown', 'user-chevron'); // User
 }
 
-function initUserDropdown() {
-    const btn = document.getElementById('user-menu-btn');
-    const menu = document.getElementById('user-dropdown');
-    const chevron = document.getElementById('user-chevron');
+// ==========================================
+// 2. SIDEBAR TOGGLE
+// ==========================================
+function initSidebarToggle() {
+    const desktopCollapseBtn = document.getElementById('desktop-collapse-btn');
+    const collapseIcon = document.getElementById('collapse-icon');
+    const mobileBtn = document.getElementById('mobile-toggle-btn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    const body = document.body;
 
-    if (!btn || !menu) return;
+    // Desktop
+    if (desktopCollapseBtn) {
+        desktopCollapseBtn.addEventListener('click', () => {
+            body.classList.toggle('sidebar-collapsed');
+            const isCollapsed = body.classList.contains('sidebar-collapsed');
 
-    btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        menu.classList.toggle('hidden');
-        if (chevron) {
-            chevron.style.transform = menu.classList.contains('hidden')
-                ? 'rotate(0deg)'
-                : 'rotate(180deg)';
+            if (collapseIcon) {
+                collapseIcon.style.transform = isCollapsed ? 'rotate(180deg)' : 'rotate(0deg)';
+            }
+            localStorage.setItem('sidebar-state', isCollapsed ? 'collapsed' : 'expanded');
+        });
+
+        // Restore State
+        if (localStorage.getItem('sidebar-state') === 'collapsed') {
+            body.classList.add('sidebar-collapsed');
+            if (collapseIcon) collapseIcon.style.transform = 'rotate(180deg)';
         }
-    });
+    }
 
-    document.addEventListener('click', (e) => {
-        if (!btn.contains(e.target) && !menu.contains(e.target)) {
-            menu.classList.add('hidden');
-            if (chevron) chevron.style.transform = 'rotate(0deg)';
+    // Mobile
+    if (mobileBtn && sidebar && overlay) {
+        mobileBtn.addEventListener('click', () => {
+            sidebar.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+            setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('opacity-0');
+            setTimeout(() => overlay.classList.add('hidden'), 300);
+        });
+    }
+}
+
+// ==========================================
+// 2. SIDEBAR TOGGLE LOGIC (Mobile & Desktop)
+// ==========================================
+function initSidebarToggle() {
+    const desktopCollapseBtn = document.getElementById('desktop-collapse-btn');
+    const collapseIcon = document.getElementById('collapse-icon');
+    const body = document.body;
+
+    // Desktop Collapse Button
+    if (desktopCollapseBtn) {
+        desktopCollapseBtn.addEventListener('click', () => {
+            body.classList.toggle('sidebar-collapsed');
+
+            // Rotate the collapse icon (<<)
+            if (collapseIcon) {
+                collapseIcon.style.transform = body.classList.contains('sidebar-collapsed')
+                    ? 'rotate(180deg)'
+                    : 'rotate(0deg)';
+            }
+
+            // Save preference
+            localStorage.setItem('sidebar-state', body.classList.contains('sidebar-collapsed') ? 'collapsed' : 'expanded');
+        });
+
+        // Restore State on Load
+        if (localStorage.getItem('sidebar-state') === 'collapsed') {
+            body.classList.add('sidebar-collapsed');
+            if (collapseIcon) collapseIcon.style.transform = 'rotate(180deg)';
         }
-    });
+    }
+
+    // Mobile Hamburger Toggle
+    const mobileBtn = document.getElementById('mobile-toggle-btn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay'); // Make sure this exists in header.ejs
+
+    if (mobileBtn && sidebar) {
+        // Create overlay if it's missing from HTML
+        if (!overlay) {
+            const newOverlay = document.createElement('div');
+            newOverlay.id = 'sidebar-overlay';
+            newOverlay.className = 'fixed inset-0 bg-slate-900/50 z-30 hidden transition-opacity opacity-0 md:hidden';
+            document.body.appendChild(newOverlay);
+
+            // Re-assign for event listener
+            var activeOverlay = newOverlay;
+        } else {
+            var activeOverlay = overlay;
+        }
+
+        mobileBtn.addEventListener('click', () => {
+            sidebar.classList.remove('-translate-x-full'); // Show sidebar
+            activeOverlay.classList.remove('hidden');
+            setTimeout(() => activeOverlay.classList.remove('opacity-0'), 10);
+        });
+
+        activeOverlay.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full'); // Hide sidebar
+            activeOverlay.classList.add('opacity-0');
+            setTimeout(() => activeOverlay.classList.add('hidden'), 300);
+        });
+    }
 }
 
 // ==========================================
