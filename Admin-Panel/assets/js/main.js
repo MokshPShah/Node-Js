@@ -49,6 +49,7 @@ function initAllDropdowns() {
 
     setup('dropdown-btn', 'dropdown-menu', 'dropdown-icon'); // Admin
     setup('cat-dropdown-btn', 'cat-dropdown-menu', 'cat-dropdown-icon'); // Category
+    setup('sub-cat-dropdown-btn', 'sub-cat-dropdown-menu', 'sub-cat-dropdown-icon'); // Sub-Category
     setup('user-menu-btn', 'user-dropdown', 'user-chevron'); // User
 }
 

@@ -1,34 +1,37 @@
 const Category = require("../models/Category");
+const SubCategory = require("../models/SubCategory");
 
-module.exports.addCategory = (req, res) => {
+module.exports.addSubCategory = async (req, res) => {
     try {
-        res.render('category/add_category', { title: 'Add Category', admin: req.user })
+        let categories = await Category.find()
+        res.render('category/subCategory/Sub_add_category', { title: 'Add Sub Category', admin: req.user, categories })
     } catch (error) {
         console.log(error)
         return res.redirect('/category/add-category');
     }
 }
 
-module.exports.insertCategory = async (req, res) => {
+module.exports.insertSubCategory = async (req, res) => {
     try {
-        let categoryData = await Category.create(req.body)
-        if (categoryData) {
-            req.flash('success', 'Category added successfully!')
-            res.redirect('/category/viewCategory')
+        let subcategoryData = await SubCategory.create(req.body)
+        if (subcategoryData) {
+            req.flash('success', 'Sub Category added successfully!')
+            res.redirect('/subCategory/viewSubCategory')
         }
     } catch (error) {
-        req.flash('error', 'Error adding Category!')
-        res.redirect('/category/addCategory')
+        console.log(error)
+        req.flash('error', 'Error adding Sub Category!')
+        res.redirect('/subCategory/addSubCategory')
     }
 }
 
-module.exports.viewCategory = async (req, res) => {
+module.exports.viewSubCategory = async (req, res) => {
     try {
-        let categories = await Category.find()
-        res.render('category/view_category', { title: 'View Category', admin: req.user, categories })
+        let subCategories = await SubCategory.find()
+        res.render('category/subCategory/sub_view_category', { title: 'View Sub Category', admin: req.user, subCategories })
     } catch (error) {
         console.log(error)
-        res.render('/categoryviewCategory', { admin: [] });
+        res.render('/subCategory/viewSubCategory', { admin: [] });
     }
 }
 
@@ -37,22 +40,23 @@ module.exports.changeStatus = async (req, res) => {
         const id = req.query.id;
         const status = req.query.status;
 
-        await Category.findByIdAndUpdate(id, { status: status })
+        await SubCategory.findByIdAndUpdate(id, { status: status })
         req.flash('success', 'Status changed successfully!')
-        res.redirect('/category/viewCategory')
+        res.redirect('/subCategory/viewSubCategory')
     } catch (error) {
         req.flash('error', 'Error updating status!')
-        res.redirect('/category/viewCategory')
+        res.redirect('/subCategory/viewSubCategory')
     }
 }
 
-module.exports.updateCategory = async (req, res) => {
+module.exports.updateSubCategory = async (req, res) => {
     try {
-        const category = await Category.findById(req.params.id)
-        res.render('category/editCategory', { title: 'Edit Category', admin: req.user, category: category })
+        const subCategory = await SubCategory.findById(req.params.id)
+        const categories = await Category.find()
+        res.render('category/subCategory/sub_edit_Category', { title: 'Edit Sub Category', admin: req.user, subCategory, categories })
     } catch (error) {
         req.flash('error', 'Error updating status!')
-        res.redirect('/category/viewCategory')
+        res.redirect('/subCategory/viewSubCategory')
     }
 }
 

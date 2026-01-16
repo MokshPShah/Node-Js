@@ -49,7 +49,7 @@ module.exports.changeStatus = async (req, res) => {
 module.exports.updateCategory = async (req, res) => {
     try {
         const category = await Category.findById(req.params.id)
-        res.render('category/editCategory', { title: 'Edit Category', admin: req.user, category: category })
+        res.render('category/edit_category', { title: 'Edit Category', admin: req.user, category: category })
     } catch (error) {
         req.flash('error', 'Error updating status!')
         res.redirect('/category/viewCategory')
