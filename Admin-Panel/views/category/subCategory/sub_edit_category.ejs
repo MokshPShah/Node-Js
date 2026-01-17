@@ -3,7 +3,8 @@
     <div class="flex-1 flex flex-col h-screen md:ml-64 transition-all duration-300">
         <div class="bg-white h-16 border-b border-slate-200 flex items-center justify-between px-6 sticky top-0 z-10">
             <h2 class="text-lg font-bold text-slate-800">Edit Sub Category</h2>
-            <a href="/subCategory/viewSubCategory" class="text-indigo-600 hover:text-indigo-700 text-sm font-medium">Back to
+            <a href="/subCategory/viewSubCategory"
+                class="text-indigo-600 hover:text-indigo-700 text-sm font-medium">Back to
                 List</a>
         </div>
 
@@ -14,7 +15,7 @@
 
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Sub Category Name</label>
-                        <input type="text" name="cat_name" value="<%= subCategory.sname %>" required
+                        <input type="text" name="sname" value="<%= subCategory.sname %>" required
                             class="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                     </div>
 
@@ -22,10 +23,10 @@
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Category Head</label>
                         <select name="categoryID"
                             class="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition shadow-sm placeholder-slate-400 text-slate-700">
-                            <option value=""> ---- Select Category Head ---- </option>
+                            <option value="" disabled> ---- Select Category Head ---- </option>
                             <% categories.forEach((category)=> { %>
-                                <option value="<%= category._id %>">
-                                    <%= category.cat_name %>
+                                <option value="<%= category._id %>" <%=category._id.equals(subCategory.categoryID._id)
+                                    ? 'selected' : '' %>><%= category.cat_name %>
                                 </option>
                                 <% }) %>
                         </select>

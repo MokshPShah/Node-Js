@@ -1,0 +1,81 @@
+const SubCategory = require("../models/SubCategory");
+const Product = require("../models/products");
+
+module.exports.addProduct = async (req, res) => {
+    try {
+        let subCategories = await SubCategory.find({ status: 1 });
+        res.render('product/addProduct', { title: 'Add Product', admin: req.user, subCategories })
+    } catch (error) {
+        console.log(error)
+        return res.redirect('/product/addProduct');
+    }
+}
+
+module.exports.insertProduct = async (req, res) => {
+    try {
+        let ProductData = await Product.create(req.body)
+        if (ProductData) {
+            req.flash('success', 'Sub Category added successfully!')
+            res.redirect('/product/viewProduct')
+        }
+    } catch (error) {
+        console.log(error)
+        req.flash('error', 'Error adding Sub Category!')
+        res.redirect('/product/addProduct')
+    }
+}
+
+module.exports.viewProduct = async (req, res) => {
+    try {
+        let subCategories = await Product.find().populate('categoryID')
+        res.render('product/viewProduct', { title: 'View Sub Category', admin: req.user, subCategories })
+    } catch (error) {
+        console.log(error)
+        res.render('/product/viewProduct', { admin: [] });
+    }
+}
+
+module.exports.changeStatus = async (req, res) => {
+    try {
+        const id = req.query.id;
+        const status = req.query.status;
+
+        await Product.findByIdAndUpdate(id, { status: status })
+        req.flash('success', 'Status changed successfully!')
+        res.redirect('/product/viewProduct')
+    } catch (error) {
+        req.flash('error', 'Error updating status!')
+        res.redirect('/product/viewProduct')
+    }
+}
+
+module.exports.updateProduct = async (req, res) => {
+    try {
+        const Product = await Product.findById(req.params.id)
+        const categories = await Category.find()
+        res.render('category/product/sub_edit_Category', { title: 'Edit Sub Category', admin: req.user, Product, categories })
+    } catch (error) {
+        req.flash('error', 'Error updating status!')
+        res.redirect('/product/viewProduct')
+    }
+}
+
+module.exports.editProduct = async (req, res) => {
+    try {
+        await Product.findByIdAndUpdate(req.params.id, req.body)
+        res.redirect('/product/viewProduct')
+    } catch (error) {
+        req.flash('error', 'Error updating status!')
+        res.redirect('/product/viewProduct')
+    }
+}
+
+module.exports.deleteProduct = async (req, res) => {
+    try {
+        await Product.findByIdAndDelete(req.params.id)
+        res.redirect('/product/viewProduct')
+    } catch (error) {
+        req.flash('error', 'Error updating status!')
+        res.redirect('/product/viewProduct')
+    }
+}

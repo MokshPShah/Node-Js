@@ -11,5 +11,7 @@ route.post('/addSubCategory', passport.checkAuthentication, subCategoryCtl.inser
 route.get('/viewSubCategory', passport.checkAuthentication, subCategoryCtl.viewSubCategory)
 route.get('/changeStatus', passport.checkAuthentication, subCategoryCtl.changeStatus)
 route.get('/updateSubCategory/:id', passport.checkAuthentication, subCategoryCtl.updateSubCategory)
+route.post('/editSubCategory/:id', passport.checkAuthentication, subCategoryCtl.editSubCategory)
+route.get('/deleteSubCategory/:id', passport.checkAuthentication, subCategoryCtl.deleteSubCategory)
 
 module.exports = route;

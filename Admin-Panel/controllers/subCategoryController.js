@@ -27,7 +27,7 @@ module.exports.insertSubCategory = async (req, res) => {
 
 module.exports.viewSubCategory = async (req, res) => {
     try {
-        let subCategories = await SubCategory.find()
+        let subCategories = await SubCategory.find().populate('categoryID')
         res.render('category/subCategory/sub_view_category', { title: 'View Sub Category', admin: req.user, subCategories })
     } catch (error) {
         console.log(error)
@@ -60,22 +60,22 @@ module.exports.updateSubCategory = async (req, res) => {
     }
 }
 
-module.exports.editCategory = async (req, res) => {
+module.exports.editSubCategory = async (req, res) => {
     try {
-        await Category.findByIdAndUpdate(req.params.id, req.body)
-        res.redirect('/category/viewCategory')
+        await SubCategory.findByIdAndUpdate(req.params.id, req.body)
+        res.redirect('/subCategory/viewSubCategory')
     } catch (error) {
         req.flash('error', 'Error updating status!')
-        res.redirect('/category/viewCategory')
+        res.redirect('/subCategory/viewSubCategory')
     }
 }
 
-module.exports.deleteCategory = async (req, res) => {
+module.exports.deleteSubCategory = async (req, res) => {
     try {
-        await Category.findByIdAndDelete(req.params.id)
-        res.redirect('/category/viewCategory')
+        await SubCategory.findByIdAndDelete(req.params.id)
+        res.redirect('/subCategory/viewSubCategory')
     } catch (error) {
         req.flash('error', 'Error updating status!')
-        res.redirect('/category/viewCategory')
+        res.redirect('/subCategory/viewSubCategory')
     }
 }

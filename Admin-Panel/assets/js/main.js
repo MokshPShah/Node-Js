@@ -2,9 +2,6 @@
 // DOM READY & INITIALIZATION
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    // initSidebar();
-    // initUserDropdown();
-    // initCategoryDropdown();
     initAllDropdowns();
     initSidebarToggle();
     initImagePreview();
@@ -50,53 +47,8 @@ function initAllDropdowns() {
     setup('dropdown-btn', 'dropdown-menu', 'dropdown-icon'); // Admin
     setup('cat-dropdown-btn', 'cat-dropdown-menu', 'cat-dropdown-icon'); // Category
     setup('sub-cat-dropdown-btn', 'sub-cat-dropdown-menu', 'sub-cat-dropdown-icon'); // Sub-Category
+    setup('prod-dropdown-btn', 'prod-dropdown-menu', 'prod-dropdown-icon'); // Products
     setup('user-menu-btn', 'user-dropdown', 'user-chevron'); // User
-}
-
-// ==========================================
-// 2. SIDEBAR TOGGLE
-// ==========================================
-function initSidebarToggle() {
-    const desktopCollapseBtn = document.getElementById('desktop-collapse-btn');
-    const collapseIcon = document.getElementById('collapse-icon');
-    const mobileBtn = document.getElementById('mobile-toggle-btn');
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebar-overlay');
-    const body = document.body;
-
-    // Desktop
-    if (desktopCollapseBtn) {
-        desktopCollapseBtn.addEventListener('click', () => {
-            body.classList.toggle('sidebar-collapsed');
-            const isCollapsed = body.classList.contains('sidebar-collapsed');
-
-            if (collapseIcon) {
-                collapseIcon.style.transform = isCollapsed ? 'rotate(180deg)' : 'rotate(0deg)';
-            }
-            localStorage.setItem('sidebar-state', isCollapsed ? 'collapsed' : 'expanded');
-        });
-
-        // Restore State
-        if (localStorage.getItem('sidebar-state') === 'collapsed') {
-            body.classList.add('sidebar-collapsed');
-            if (collapseIcon) collapseIcon.style.transform = 'rotate(180deg)';
-        }
-    }
-
-    // Mobile
-    if (mobileBtn && sidebar && overlay) {
-        mobileBtn.addEventListener('click', () => {
-            sidebar.classList.remove('-translate-x-full');
-            overlay.classList.remove('hidden');
-            setTimeout(() => overlay.classList.remove('opacity-0'), 10);
-        });
-
-        overlay.addEventListener('click', () => {
-            sidebar.classList.add('-translate-x-full');
-            overlay.classList.add('opacity-0');
-            setTimeout(() => overlay.classList.add('hidden'), 300);
-        });
-    }
 }
 
 // ==========================================

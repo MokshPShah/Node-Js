@@ -39,5 +39,6 @@ route.post('/update-admin/:id', passport.checkAuthentication, Admin.uploadAdminI
 // Category Routes
 route.use('/category', require('./categoryRoute'))
 route.use('/subcategory', require('./subCategoryRoute'))
+route.use('/product', require('./product'))
 
 module.exports = route;
