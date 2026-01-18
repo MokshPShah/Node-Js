@@ -13,22 +13,33 @@ module.exports.addProduct = async (req, res) => {
 
 module.exports.insertProduct = async (req, res) => {
     try {
-        let ProductData = await Product.create(req.body)
-        if (ProductData) {
-            req.flash('success', 'Sub Category added successfully!')
-            res.redirect('/product/viewProduct')
+        let imagePath = '';
+        if (req.file) {
+            imagePath = Product.productPath + '' + req.file.filename;
         }
+
+        await Product.create({
+            product_name: req.body.product_name,
+            price: req.body.price,
+            desc: req.body.desc,
+            categoryId: req.body.categoryId,
+            product_image: imagePath,
+            status: req.body.status
+        });
+
+        req.flash('success', 'Product added successfully!')
+        res.redirect('/product/viewProduct')
     } catch (error) {
         console.log(error)
-        req.flash('error', 'Error adding Sub Category!')
+        req.flash('error', 'Error adding Product!')
         res.redirect('/product/addProduct')
     }
 }
 
 module.exports.viewProduct = async (req, res) => {
     try {
-        let subCategories = await Product.find().populate('categoryID')
-        res.render('product/viewProduct', { title: 'View Sub Category', admin: req.user, subCategories })
+        let products = await Product.find().populate('categoryId')
+        res.render('product/viewProduct', { title: 'View Products', admin: req.user, products })
     } catch (error) {
         console.log(error)
         res.render('/product/viewProduct', { admin: [] });
@@ -53,7 +64,7 @@ module.exports.updateProduct = async (req, res) => {
     try {
         const Product = await Product.findById(req.params.id)
         const categories = await Category.find()
-        res.render('category/product/sub_edit_Category', { title: 'Edit Sub Category', admin: req.user, Product, categories })
+        res.render('category/product/sub_edit_Category', { title: 'Edit Product', admin: req.user, Product, categories })
     } catch (error) {
         req.flash('error', 'Error updating status!')
         res.redirect('/product/viewProduct')

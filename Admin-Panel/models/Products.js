@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const path = require('path')
 const multer = require('multer')
 
-const imagePath = '/uploads/productImages/';
+const imagePath = '/uploads/productsImages/';
 
 const productSchema = new mongoose.Schema({
     product_name: {
@@ -11,25 +11,23 @@ const productSchema = new mongoose.Schema({
     },
     price: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     desc: {
         type: String,
         required: true
     },
-    CategoryID: {
+    categoryId: {
         type: mongoose.Schema.ObjectId,
-        ref: 'SubCategories',
-        required: true
+        ref: 'SubCategories'
     },
     product_image: {
         type: String,
         required: true
     },
-    Status: {
+    status: {
         type: Number,
-        retuired: true
+        required: true
     }
 })
 
