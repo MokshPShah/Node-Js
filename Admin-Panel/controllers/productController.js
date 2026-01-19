@@ -18,14 +18,7 @@ module.exports.insertProduct = async (req, res) => {
             imagePath = Product.productPath + '' + req.file.filename;
         }
 
-        await Product.create({
-            product_name: req.body.product_name,
-            price: req.body.price,
-            desc: req.body.desc,
-            categoryId: req.body.categoryId,
-            product_image: imagePath,
-            status: req.body.status
-        });
+        await Product.create({ ...req.body, product_image: imagePath });
 
         req.flash('success', 'Product added successfully!')
         res.redirect('/product/viewProduct')
@@ -38,7 +31,15 @@ module.exports.insertProduct = async (req, res) => {
 
 module.exports.viewProduct = async (req, res) => {
     try {
-        let products = await Product.find().populate('categoryId')
+        let products = await Product.find().populate({
+            path: 'subcategoryID',
+            select: 'sname categoryID',
+            populate: {
+                path: 'categoryID',
+                select: 'cat_name',
+            }
+        })
+        // res.json(products)
         res.render('product/viewProduct', { title: 'View Products', admin: req.user, products })
     } catch (error) {
         console.log(error)

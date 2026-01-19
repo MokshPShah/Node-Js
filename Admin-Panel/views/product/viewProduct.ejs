@@ -19,6 +19,7 @@
                                 <th class="px-6 py-4">Image</th>
                                 <th class="px-6 py-4">Product Name</th>
                                 <th class="px-6 py-4">Category</th>
+                                <th class="px-6 py-4">Sub Category</th>
                                 <th class="px-6 py-4">Price</th>
                                 <th class="px-6 py-4 text-center">Status</th>
                                 <th class="px-6 py-4 text-right">Actions</th>
@@ -33,16 +34,25 @@
                                                 class="w-12 h-12 rounded-lg object-cover border border-slate-200"
                                                 alt="<%= item.product_name %>">
                                         </td>
-                                        <td class="px-6 py-3 font-medium text-slate-800">
+                                        <td class="px-6 py-3 font-medium text-slate-800 w-96">
                                             <%= item.product_name %>
                                         </td>
+                                        
                                         <td class="px-6 py-3 text-slate-500">
                                             <span
                                                 class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-semibold">
-                                                <%= item.categoryId ? item.categoryId.sname : 'No Category' %>
+                                                <%= item.subcategoryID.categoryID ? item.subcategoryID.categoryID.cat_name : 'No Category' %>
                                             </span>
                                         </td>
-                                        <td class="px-6 py-3 font-semibold text-slate-700">$<%= item.price %>
+
+                                        <td class="px-6 py-3 text-slate-500">
+                                            <span
+                                                class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-semibold">
+                                                <%= item.subcategoryID ? item.subcategoryID.sname : 'No Sub Category' %>
+                                            </span>
+                                        </td>
+
+                                        <td class="px-6 py-3 font-semibold text-slate-700">₹<%= item.price %>
                                         </td>
                                         <td class="px-6 py-3 text-center">
                                             <% if (item.status==1) { %>
