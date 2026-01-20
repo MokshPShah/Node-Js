@@ -54,29 +54,29 @@
 
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <style>
-        .toastify {
-            background: #ffffff !important;
-            color: #334155 !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-            border-radius: 8px !important;
-            padding: 16px 20px !important;
-            font-size: 14px !important;
-            font-weight: 500 !important;
-            display: flex !important;
-            align-items: center !important;
-            position: relative !important;
-            overflow: hidden !important;
-        }
+    .toastify {
+        background: white !important;
+        color: #334155 !important;
+        position: fixed !important;
+        z-index: 99999 !important;
+        padding: 15px;
+    }
 
-        .toastify::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            height: 4px;
-            width: 100%;
-            animation: toast-progress 3s linear forwards;
-        }
+    .toastify .toast-close {
+        color: #334155 !important;
+        opacity: 1 !important;
+        margin-left: 10px;
+    }
+
+    .toastify::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 4px;
+        width: 100%;
+        animation: toast-progress 3.6s linear forwards;
+    }
 
         .toast-success::after {
             background-color: #10b981;
@@ -101,14 +101,28 @@
         lucide.createIcons();
         
         <% if (locals.flash && locals.flash.success && locals.flash.success.length > 0) { %>
-            Toastify({ text: "<%= locals.flash.success %>", duration: 3000, close: true, gravity: "top", position: "right", className: "toast-success" }).showToast();
+            Toastify({
+                text: "<%= locals.flash.success %>",
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                stopOnFocus: true,
+                className: "toast-success"
+            }).showToast();
         <% } %>
         <% if (locals.flash && locals.flash.error && locals.flash.error.length > 0) { %>
-            Toastify({ text: "<%= locals.flash.error %>", duration: 3000, close: true, gravity: "top", position: "right", className: "toast-error" }).showToast();
+            Toastify({
+                text: "<%= locals.flash.error %>",
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                stopOnFocus: true,
+                className: "toast-error"
+            }).showToast();
         <% } %>
     </script>
-
-    <script>lucide.createIcons();</script>
 </body>
 
 </html>
