@@ -1,5 +1,5 @@
 const SubCategory = require("../models/SubCategory");
-const Product = require("../models/products");
+const Product = require("../models/Products");
 
 module.exports.addProduct = async (req, res) => {
     try {
@@ -18,7 +18,7 @@ module.exports.insertProduct = async (req, res) => {
             imagePath = Product.productPath + '' + req.file.filename;
         }
 
-        await Product.create({ ...req.body, product_image: imagePath });
+        await Product.create({ ...req.body, product_image: imagePath, userID: req.user._id });
 
         req.flash('success', 'Product added successfully!')
         res.redirect('/product/viewProduct')
@@ -31,7 +31,7 @@ module.exports.insertProduct = async (req, res) => {
 
 module.exports.viewProduct = async (req, res) => {
     try {
-        let products = await Product.find().populate({
+        let products = await Product.find({ userID: req.user._id }).populate({
             path: 'subcategoryID',
             select: 'sname categoryID',
             populate: {

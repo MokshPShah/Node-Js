@@ -28,6 +28,10 @@ const productSchema = new mongoose.Schema({
     status: {
         type: Number,
         required: true
+    },
+    userID: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Admin'
     }
 })
 
