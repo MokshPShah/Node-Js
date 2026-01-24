@@ -4,7 +4,7 @@ const Admin = require('../models/Admin')
 const route = express.Router();
 const cookieParser = require('cookie-parser')
 const passport = require('passport');
-const { checkRole } = require('../config/middleware')
+
 route.use(cookieParser())
 
 route.get('/login', adminCtl.login)
@@ -29,7 +29,7 @@ route.post('/change-password', passport.checkAuthentication, Admin.uploadAdminIm
 route.post('/delete-my-account', passport.checkAuthentication, Admin.uploadAdminImage, adminCtl.deleteMyAccount)
 
 route.get('/add-admin', passport.checkAuthentication, adminCtl.addAdmin)
-route.get('/view-admin', passport.checkAuthentication, checkRole(['Super Admin', 'City Admin', 'Zonal Admin']), adminCtl.viewAdmin)
+route.get('/view-admin', passport.checkAuthentication, adminCtl.viewAdmin)
 route.post('/insertAdminData', passport.checkAuthentication, Admin.uploadAdminImage, adminCtl.insertAdminData)
 
 route.get('/adminDetails/:id', passport.checkAuthentication, adminCtl.adminDetails)

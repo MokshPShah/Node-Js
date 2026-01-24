@@ -37,17 +37,6 @@ const adminSchema = new mongoose.Schema({
     date: {
         type: Date,
         retuired: true
-    },
-    role: {
-        type: String,
-        enum: ['Super Admin', 'City Admin', 'Zonal Admin', 'Shop Admin'],
-        default: 'Shop Admin'
-    },
-    city: {
-        type: String
-    },
-    zone: {
-        type: String
     }
 })
 

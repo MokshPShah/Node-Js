@@ -138,7 +138,6 @@
                     <span class="nav-text font-medium">Dashboard</span>
                 </a>
 
-                <% if (typeof admin !== 'undefined' && admin.role !== 'Shop Admin') { %>
                 <div class="relative group">
                     <button id="dropdown-btn"
                         class="nav-item w-full flex items-center justify-between px-3 py-2.5 text-slate-600 rounded-lg hover:bg-slate-50 hover:text-indigo-600 transition-colors cursor-pointer">
@@ -162,7 +161,6 @@
                             All Admins</a>
                     </div>
                 </div>
-                <% } %>
 
                 <div class="relative group">
                     <button id="cat-dropdown-btn"
@@ -236,13 +234,11 @@
                     </div>
                 </div>
 
-                <% if(locals.trashCount > 0) { %>
-                    <a href="/product/trashView"
-                        class="nav-item flex items-center px-3 py-2.5 text-slate-600 rounded-lg hover:bg-slate-50 hover:text-indigo-600 transition-colors group relative">
-                        <i data-lucide="trash-2" class="w-5 h-5 mr-3 group-hover:text-indigo-600 flex-shrink-0"></i>
-                        <span class="nav-text font-medium">Bin</span>
-                    </a>
-                    <% } %>
+                <a href="/product/trashView"
+                    class="nav-item flex items-center px-3 py-2.5 text-slate-600 rounded-lg hover:bg-slate-50 hover:text-indigo-600 transition-colors group relative">
+                    <i data-lucide="trash-2" class="w-5 h-5 mr-3 group-hover:text-indigo-600 flex-shrink-0"></i>
+                    <span class="nav-text font-medium">Bin</span>
+                </a>
 
             </nav>
 

@@ -5,7 +5,6 @@ const session = require('express-session')
 const passport = require('passport')
 const passportLocal = require('./config/passport-local-stratergy.js')
 const flash = require('connect-flash')
-const Product = require('./models/Products')
 
 const PORT = 8001;
 
@@ -33,27 +32,6 @@ app.use(passport.session())
 app.use(passport.setAuthenticatedUser)
 
 app.use(flash());
-
-// middleware for bin count
-app.use(async function (req, res, next) {
-    if (req.isAuthenticated()) {
-        try {
-            const trashCount = await Product.countDocuments({
-                userID: req.user._id,
-                isDeleted: true
-            })
-
-            res.locals.trashCount = trashCount
-        } catch (err) {
-            console.log("Error counting trash:", err);
-            res.locals.trashCount = 0;
-        }
-    } else {
-        res.locals.trashCount = 0
-    }
-    next();
-})
-
 app.use(function (req, res, next) {
     res.locals.flash = {
         'success': req.flash('success'),

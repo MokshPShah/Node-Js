@@ -373,30 +373,12 @@ module.exports.addAdmin = async (req, res) => {
 
 module.exports.viewAdmin = async (req, res) => {
     try {
-        let filter = {};
-
-        if (req.user.role === 'Super Admin') {
-            filter = {}
-        } else if (req.user.role === 'City Admin') {
-            filter = {
-                city: req.user.city,
-                role: { $in: ['Zonal Admin', 'Shop Admin'] }
-            }
-        } else if (req.user.role === 'Zonal Admin') {
-            filter = {
-                city: req.user.city,
-                zone: req.user.zone,
-                role: 'Shop Admin'
-            }
-        } else {
-            filter = { _id: req.user._id }
-        }
-
-        const admins = await Admin.find(filter);
+        const admin = req.user
+        const admins = await Admin.find({});
         res.render('view-admin', {
             title: 'View Admin',
             admins,
-            admin: req.user
+            admin
         });
     } catch (error) {
         console.log(error)
@@ -413,19 +395,7 @@ module.exports.insertAdminData = async (req, res) => {
             return res.redirect('/add-admin');
         }
 
-        const { fname, lname, email, password, gender, desc, date, city, zone, role } = req.body
-
-        let finalCity = city;
-        let finalZone = zone;
-
-        if (req.user.role === 'City Admin') {
-            finalCity = req.user.city
-        }
-
-        if (req.user.zone === 'Zonal Admin') {
-            finalCity = req.user.city;
-            finalZone = req.user.zone;
-        }
+        const { fname, lname, email, password, gender, desc, date } = req.body
 
         const imagePath = req.file ? Admin.adPath + req.file.filename : null;
 
@@ -441,12 +411,7 @@ module.exports.insertAdminData = async (req, res) => {
             hobby: hobbies,
             desc: desc,
             avatar: imagePath,
-            role: req.body.role || 'Shop Admin',
-            date: date,
-            // New Fileds for role base Authentication
-            role: role,
-            city: finalCity,
-            zone: finalZone
+            date: date
         });
 
         req.flash('success', 'New Admin Created Successfully!');
