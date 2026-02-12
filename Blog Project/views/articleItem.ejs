@@ -1,0 +1,8 @@
+<div class="article-card">
+    <h2><%= article.title %></h2>
+    <div class="article-meta">
+        Written by: <strong><%= article.author ? article.author.username : 'Unknown' %></strong> 
+        | <%= new Date(article.createdAt).toDateString() %>
+    </div>
+    <p class="article-content"><%= article.content %></p>
+</div>

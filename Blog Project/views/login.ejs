@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | NewsChaser</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('partials/navbar') %>
+
+    <div class="container auth-wrapper">
+        <form action="/login" method="POST" class="form-card">
+            <h2 class="form-title">Welcome Back</h2>
+            
+            <% if(locals.error) { %> 
+                <div class="alert"><%= error %></div>
+            <% } %>
+
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <input type="text" name="username" class="form-control" placeholder="Enter your username" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Sign In</button>
+
+            <div class="form-footer">
+                Don't have an account? <a href="/register" class="btn-link">Create one</a>
+            </div>
+        </form>
+    </div>
+
+    <%- include('partials/footer') %>
+</body>
+</html>

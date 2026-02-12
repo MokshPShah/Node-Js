@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard | NewsChaser</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('partials/navbar') %>
+
+    <main class="container">
+        <header class="page-header">
+            <h1 class="page-title">My Articles</h1>
+            <a href="/create" class="btn btn-primary" style="width: auto;">+ New Article</a>
+        </header>
+
+        <div class="grid">
+            <% if(articles.length > 0) { %>
+                <% articles.forEach(article => { %>
+                    <article class="card">
+                        <div class="card-body">
+                            <div class="card-meta">Posted on <%= new Date(article.createdAt).toLocaleDateString() %></div>
+                            <h2 class="card-title"><%= article.title %></h2>
+                            <p class="card-text"><%= article.content %></p>
+                        </div>
+                    </article>
+                <% }) %>
+            <% } else { %>
+                <div style="grid-column: 1/-1; text-align: center; padding: 4rem; background: white; border-radius: 12px; border: 1px dashed var(--border);">
+                    <p style="color: var(--secondary); margin-bottom: 1rem;">You haven't published anything yet.</p>
+                    <a href="/create" class="btn-link">Write your first post &rarr;</a>
+                </div>
+            <% } %>
+        </div>
+    </main>
+
+    <%- include('partials/footer') %>
+</body>
+</html>

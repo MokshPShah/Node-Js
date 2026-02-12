@@ -1,0 +1,20 @@
+<nav class="navbar">
+    <a href="/" class="nav-brand">NewsChaser</a>
+    
+    <ul class="nav-links">
+        <li><a href="/">Explore</a></li>
+        <% if (user) { %>
+            
+            <% if (user.role === 'admin') { %>
+                <li><a href="/admin" class="nav-btn" style="background-color: var(--danger);">Admin Panel</a></li>
+            <% } %>
+
+            <li><a href="/my-articles">My Articles</a></li>
+            <li><a href="/create">Write</a></li>
+            <li><a href="/logout">Logout</a></li>
+        <% } else { %>
+            <li><a href="/login">Login</a></li>
+            <li><a href="/register">Register</a></li>
+        <% } %>
+    </ul>
+</nav>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore | DevChronicles</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('partials/navbar') %>
+
+    <main class="container">
+        <header class="page-header">
+            <h1 class="page-title">Latest Articles</h1>
+            <% if(user && user.role === 'admin') { %>
+                <span class="admin-badge" style="background-color: #ef4444; color: white; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; margin-left: 10px;">Admin Mode Active</span>
+            <% } %>
+        </header>
+
+        <div class="grid">
+            <% if(articles.length > 0) { %>
+                
+                <% articles.forEach(article => { %>
+                    <article class="card">
+                        <div class="card-body">
+                            <div style="display: flex; justify-content: space-between; align-items: start;">
+                                <div class="card-meta"><%= new Date(article.createdAt).toLocaleDateString() %></div>
+                                
+                                <% if (user && (user.role === 'admin' || (article.author && user.id == article.author.id))) { %>
+                                    <form action="/delete/<%= article._id %>" method="POST" onsubmit="return confirm('Delete this article?');">
+                                        <button type="submit" style="background:none; border:none; cursor:pointer; font-size:1.2rem;">🗑️</button>
+                                    </form>
+                                <% } %>
+                            </div>
+
+                            <h2 class="card-title"><%= article.title %></h2>
+                            <p class="card-text"><%= article.content %></p>
+                        </div>
+                        <div class="card-footer">
+                            <span class="author-info">
+                                By <%= article.author ? article.author.username : 'Unknown' %>
+                                <% if(article.author && article.author.role === 'admin') { %>
+                                    <span style="background: #ef4444; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-left: 5px;">ADMIN</span>
+                                <% } %>
+                            </span>
+                        </div>
+                    </article>
+                <% }) %> 
+                <% } else { %>
+                <div style="grid-column: 1/-1; text-align: center; padding: 4rem; color: #64748b;">
+                    <p>No articles found yet. Be the first to write one!</p>
+                </div>
+            <% } %>
+        </div>
+    </main>
+
+    <%- include('partials/footer') %>
+</body>
+</html>
